@@ -8,18 +8,25 @@ from langchain_openai import OpenAIEmbeddings
 st.set_page_config(page_title="ML Textbook Chatbot", page_icon="📚")
 st.title("📚 Machine Learning Textbook Chatbot")
 
-# Sidebar for API Keys configuration (optional, or use env vars)
-with st.sidebar:
-    st.header("Configuration")
-    openai_api_key = st.text_input("OpenAI API Key", type="password", value=os.environ.get("OPENAI_API_KEY", ""))
-    pinecone_api_key = st.text_input("Pinecone API Key", type="password", value=os.environ.get("PINECONE_API_KEY", ""))
-    
-    if not openai_api_key:
-        st.warning("Please enter your OpenAI API Key to proceed.")
-        st.stop()
-    if not pinecone_api_key:
-        st.warning("Please enter your Pinecone API Key to proceed.")
-        st.stop()
+# Sidebar for API Keys configuration
+# Check if keys are available in secrets (for deployment)
+if "OPENAI_API_KEY" in st.secrets:
+    openai_api_key = st.secrets["OPENAI_API_KEY"]
+else:
+    # Local fallback or manual entry
+    openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
+
+if "PINECONE_API_KEY" in st.secrets:
+    pinecone_api_key = st.secrets["PINECONE_API_KEY"]
+else:
+    pinecone_api_key = st.sidebar.text_input("Pinecone API Key", type="password")
+
+if not openai_api_key:
+    st.warning("Please enter your OpenAI API Key to proceed.")
+    st.stop()
+if not pinecone_api_key:
+    st.warning("Please enter your Pinecone API Key to proceed.")
+    st.stop()
 
 # Initialize Clients
 client = OpenAI(api_key=openai_api_key)
